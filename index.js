@@ -9,20 +9,41 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 var gameState = { isXnext: true, squares: Array(9).fill('') };
 
+function wins(turn) {
+  var squres = gameState.squres;
+
+  return  (squres[0]==turn && squres[1]==turn && squres[2]==turn)||
+          (squres[3]==turn && squres[4]==turn && squres[5]==turn)||
+          (squres[6]==turn && squres[7]==turn && squres[8]==turn)||
+          (squres[0]==turn && squres[3]==turn && squres[6]==turn)||
+          (squres[1]==turn && squres[4]==turn && squres[7]==turn)||
+          (squres[2]==turn && squres[5]==turn && squres[8]==turn)||
+          (squres[0]==turn && squres[4]==turn && squres[8]==turn)||
+          (squres[2]==turn && squres[4]==turn && squres[6]==turn)
+};
+
+
 app.get('/game_state', (req, res) => {
   res.charset = 'UTF-8';
   res.send(gameState); // send JSON
 } );
 
-// https://...../move?turn=X&pos=4
+// https://...../move?turn=X&pos=4r
 app.get('/move', (req, res) => {
   res.charset = 'UTF-8';
   var turn = req.query.turn;
   var pos = req.query.pos;
+  //OK 조건 검사
+  if((gameState.isXnext && turn == 'X') ||
+  (!gameState.isXnext && turn == 'O') ){
   console.log('move: '+turn+pos);
   gameState.squares[pos] = turn;
   gameState.isXnext = !gameState.isXnext;
   res.send('OK');
+}else {
+  res.send('ERROR');
+}
+
 } );
 
 app.get('/', (req, res) => {
